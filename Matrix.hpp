@@ -22,26 +22,25 @@ public:
     //O(n^2)
     Matrix(int n);
     
+    //vector of vectors constructor
     Matrix(std::vector<std::vector<double>> matrix);
+    
+    //initializer list constructor
     Matrix(std::initializer_list<std::initializer_list<double>> set);
+    
+    //creates an n x n identity matrix
+    static Matrix identity(int n);
     
     ~Matrix();
     Matrix(const Matrix& other);
     Matrix operator= (Matrix other);
     
+    
     bool operator== (const Matrix& other) const;
-    
-    
-    //Sets the matrix to the identity matrix. Pair this with the ctr
-    //Precondition: rows = columns ie a square n*n matrix
-    //Postcondition: overwrites matrixArray with identity matrix. If precondition
-    //is false, this function does nothing.
-    //O(n)
-    void identity();
     
     //Replaces all entries in the matrix with value x
     //O(n*m)
-    void fill(int x);
+    void fill(double x);
     
     //Precondition: index1 and index2 are not equal and are between 1 and rows.
     //assumes rows > 1
@@ -56,17 +55,20 @@ public:
     void columnSwap(int columnIndex1, int columnIndex2);
     
     //Multiplies all entries in row at index by x
-    void multiplyRow(int index, int x);
+    void multiplyRow(int index, double x);
     
     //Divides all entries in row at index by x
-    void divideRow(int index, int x);
+    void divideRow(int index, double x);
     
     //
     //adds each element from row x to row y, and stores the result in y
-    void addRows(int scalar, int index1, int index2);
+    void addRows(double scalar, int index1, int index2);
     
     void ref();
     void rref();
+    
+    int refDebug();
+    void rrefDebug();
     
     void print() const;
     
@@ -83,8 +85,6 @@ private:
     int rows;
     int columns;
     double** matrixArray;
-    
-    
     
 };
 

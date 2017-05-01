@@ -5,16 +5,28 @@
  * Created on April 25, 2017, 8:51 AM
  */
 
-#include <cstdlib>
+
 #include "Matrix.hpp"
 #include <vector>
 #include <iostream>
+#include <chrono>
+#include <iomanip>
+#include <ctime>
+#include <cstdlib>
 
 /*
  * 
  */
-int main(int argc, char** argv) {
+std::chrono::high_resolution_clock::time_point time();
+void timeTaken(std::chrono::high_resolution_clock::time_point t1,
+        std::chrono::high_resolution_clock::time_point t2);
 
+
+int main(int argc, char** argv) {
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point stop;
+    
+    
 //*** Constructor examples
     
     //vector constructor
@@ -43,7 +55,12 @@ int main(int argc, char** argv) {
             rc[i][j] = (i+1) * (j+1);
     std::cout << "manual ctr\n";
     rc.print();
-    //**********     
+    //**********    
+    
+    //construct a 3x3 identity matrix 
+    Matrix identity = Matrix::identity(3);
+    std::cout << "identity ctr\n";
+    identity.print();
                
 //testing operations
     /*
@@ -56,11 +73,45 @@ int main(int argc, char** argv) {
      *                                   [0][0][1] [ 0]
      */ 
     f.print();
+    start = time();
     f.ref();
+    f.rref();
+    stop = time();
+    timeTaken(start,stop);
     f.print();
-
+    
+    std::srand(1);
+    start = time();
+    int n = 4;
+    Matrix test(n,n+1);
+    for(int i = 0; i < n; ++i) {
+        for(int j = 0; j < n+1; ++j) {
+            test[i][j] = (rand() % 144) + 1;
+        }
+    }
+    test.print();
+    stop = time();
+    timeTaken(start,stop);
+    
+    start = time();
+    test.rrefDebug();
+    stop = time();
+    timeTaken(start,stop);
+    
 
     
     return 0;
 }
 
+std::chrono::high_resolution_clock::time_point time() {
+    return std::chrono::high_resolution_clock::now();
+}
+
+void timeTaken(std::chrono::high_resolution_clock::time_point t1,
+        std::chrono::high_resolution_clock::time_point t2) {
+
+    std::cout  << std::fixed << "Tike taken: " << std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count()
+            << "\n\n";
+    std::cout.unsetf(std::ios_base::fixed);
+
+}

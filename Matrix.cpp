@@ -94,13 +94,15 @@ double* Matrix::operator[] (int index) {
 }
 
 
-void Matrix::identity() {
-    if(rows == columns)
-        for(int i = 0; i < rows; ++i)
-            matrixArray[i][i] = 1;
+Matrix Matrix::identity(int n) {
+    Matrix identity(n);
+    for(int i = 0; i < n; ++i)
+        identity.matrixArray[i][i] = 1;
+    return identity;
 }
 
-void Matrix::fill(int x) {
+
+void Matrix::fill(double x) {
     for(int i = 0; i < rows; ++i)
         for(int j = 0; j < columns; ++j)
             matrixArray[i][j] = x;
@@ -125,17 +127,19 @@ void Matrix::columnSwap(int columnIndex1, int columnIndex2) {
         std::swap(matrixArray[i][columnIndex1], matrixArray[i][columnIndex2]);
 }
 
-void Matrix::multiplyRow(int index, int x) {
+void Matrix::multiplyRow(int index, double x) {
     for(int i = 0; i < columns; ++i)
         matrixArray[index][i] *= x;
 }
 
-void Matrix::divideRow(int index, int x) {
+void Matrix::divideRow(int index, double x) {
+    if(x == 0) //cant divide by zero
+        return;
     for(int i = 0; i < columns; ++i)
         matrixArray[index][i] /= x;    
 }
 
-void Matrix::addRows(int scalar, int index1, int index2) {
+void Matrix::addRows(double scalar, int index1, int index2) {
     for(int i = 0; i < columns; ++i)
         matrixArray[index2][i] += matrixArray[index1][i] * scalar;
 }
@@ -144,30 +148,95 @@ void Matrix::ref(){
     //for each row
     for(int i = 0; i < rows; ++i) {
         //need to row swap
-        if(matrixArray[i][i] == 0) { 
-            for(int j = i + 1; j < rows; ++j){
+        if(matrixArray[i][i] == 0)
+            for(int j = i + 1; j < rows; ++j)
                 if(matrixArray[j][i] != 0) {
                     rowSwap(i, j);
                     break;
                 }   
-            }
-        }
         //get a 1 in the pivot position
-        if(matrixArray[i][i] != 1)
+        if(matrixArray[i][i] != 1 && matrixArray[i][i] != 0)
             divideRow(i, matrixArray[i][i]);
             
         //zero out entries below pivot
-        for(int j = i + 1; j < rows; ++j) {
+        for(int j = i + 1; j < rows; ++j) 
             if(matrixArray[j][i] != 0)
                 addRows(-1 * matrixArray[j][i], i, j);
-        }
     }
 }
 
 void Matrix::rref() {
     ref();
+    //loop to get the bottom right diagonal and move up
+    for(int i = rows - 1; i > -1; --i) 
+        //look at each index above the current pivot
+        for(int j = i - 1; j > -1; --j) 
+            if(matrixArray[j][i] != 0.0) 
+                //zero out the indeces
+                addRows(-1 * matrixArray[j][i], i, j);
 }
 
+
+int Matrix::refDebug(){
+    int step = 1;
+    //for each row
+    int additions = 0;
+    for(int i = 0; i < rows; ++i) {
+        //need to row swap
+        if(matrixArray[i][i] == 0)
+            for(int j = i + 1; j < rows; ++j)
+                if(matrixArray[j][i] != 0) {
+                    std::cout << "Step " << step++ << ": swap row " << i+1 << " with " << j+1 << "\n";
+                    rowSwap(i, j);
+                    print();
+                    break;
+                }   
+        //get a 1 in the pivot position
+        if(matrixArray[i][i] != 1 && matrixArray[i][i] != 0) {
+            std::cout << "Step " << step++ << ": divide row " << i+1 << " by " << matrixArray[i][i] << "\n";
+            divideRow(i, matrixArray[i][i]);
+            print();
+        }
+            
+        //zero out entries below pivot
+        for(int j = i + 1; j < rows; ++j) 
+            if(matrixArray[j][i] != 0)
+            {
+                std::cout << "Step " << step++ << ": multiply row " << i+1
+                        << " by " << -1*matrixArray[j][i] << " and adding to row " << j+1 << "\n";
+                addRows(-1 * matrixArray[j][i], i, j);
+                ++additions;
+                print();
+            }
+    }
+    std::cout << "Number of row additions: " << additions << "\n";
+    std::cout << "---Row Echelon Form Matrix---\n";
+    print();
+    return step;
+}
+
+
+void Matrix::rrefDebug() {
+    int step = refDebug();
+    //loop to get the bottom right diagonal and move up
+    int additions = 0;
+    for(int i = rows - 1; i > -1; --i) {
+        //look at each index above the current pivot
+        for(int j = i - 1; j > -1; --j) {
+            if(matrixArray[j][i] != 0.0) {
+                //zero out the indeces
+                std::cout << "Step " << step++ << ": multiply row " << i+1
+                << " by " << -1*matrixArray[j][i] << " and adding to row " << j+1 << "\n";
+                addRows(-1 * matrixArray[j][i], i, j);
+                ++additions;
+                print();
+            }
+        }
+    }
+    std::cout << "row addition operations: " << additions << "\n";
+    std::cout << "---Recuded Row Echelon Form Matrix---\n";
+    print();
+}
 
 
 void Matrix::print() const {
