@@ -171,9 +171,14 @@ void Matrix::rref() {
     for(int i = rows - 1; i > -1; --i) 
         //look at each index above the current pivot
         for(int j = i - 1; j > -1; --j) 
-            if(matrixArray[j][i] != 0.0) 
+            if(matrixArray[j][i] != 0) { 
                 //zero out the indeces
-                addRows(-1 * matrixArray[j][i], i, j);
+                double scalar = -1 * matrixArray[j][i];
+                matrixArray[j][i] += matrixArray[i][i] * scalar;
+                //update the augmented matrix should one exist
+                for(int k = rows; k < columns; ++k)
+                    matrixArray[j][k] += matrixArray[i][k] * scalar;
+            }
 }
 
 
@@ -227,7 +232,14 @@ void Matrix::rrefDebug() {
                 //zero out the indeces
                 std::cout << "Step " << step++ << ": multiply row " << i+1
                 << " by " << -1*matrixArray[j][i] << " and adding to row " << j+1 << "\n";
-                addRows(-1 * matrixArray[j][i], i, j);
+                //addRows(-1 * matrixArray[j][i], i, j);
+                double scalar = -1 * matrixArray[j][i];
+                matrixArray[j][i] += matrixArray[i][i] * scalar;
+                
+                //update the augmented matrix should one exist
+                for(int k = rows; k < columns; ++k)
+                    matrixArray[j][k] += matrixArray[i][k] * scalar;
+                
                 ++additions;
                 print();
             }

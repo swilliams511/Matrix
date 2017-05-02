@@ -74,7 +74,6 @@ int main(int argc, char** argv) {
      */ 
     f.print();
     start = time();
-    f.ref();
     f.rref();
     stop = time();
     timeTaken(start,stop);
@@ -95,6 +94,7 @@ int main(int argc, char** argv) {
     
     start = time();
     test.rrefDebug();
+    test.rref();
     stop = time();
     timeTaken(start,stop);
     
