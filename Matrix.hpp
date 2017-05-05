@@ -60,9 +60,11 @@ public:
     //Divides all entries in row at index by x
     void divideRow(int index, double x);
     
+    
     //
     //adds each element from row x to row y, and stores the result in y
     void addRows(double scalar, int index1, int index2);
+    
     
     void ref();
     void rref();
@@ -86,6 +88,10 @@ private:
     int columns;
     double** matrixArray;
     
+    
+    void addRows(double scalar, int index1, int index2, int startIndex);
+    
+    void divideRow(int rowIndex, int startIndex, double x);
 };
 
 

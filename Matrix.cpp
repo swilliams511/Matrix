@@ -139,8 +139,20 @@ void Matrix::divideRow(int index, double x) {
         matrixArray[index][i] /= x;    
 }
 
+void Matrix::divideRow(int rowIndex, int startIndex, double x) {
+    if(x == 0) //cant divide by zero
+        return;
+    for(int i = startIndex; i < columns; ++i)
+        matrixArray[rowIndex][i] /= x;    
+}
+
 void Matrix::addRows(double scalar, int index1, int index2) {
     for(int i = 0; i < columns; ++i)
+        matrixArray[index2][i] += matrixArray[index1][i] * scalar;
+}
+
+void Matrix::addRows(double scalar, int index1, int index2, int startIndex) {
+    for(int i = startIndex; i < columns; ++i)
         matrixArray[index2][i] += matrixArray[index1][i] * scalar;
 }
 
@@ -156,12 +168,12 @@ void Matrix::ref(){
                 }   
         //get a 1 in the pivot position
         if(matrixArray[i][i] != 1 && matrixArray[i][i] != 0)
-            divideRow(i, matrixArray[i][i]);
+            divideRow(i, i, matrixArray[i][i]);
             
         //zero out entries below pivot
         for(int j = i + 1; j < rows; ++j) 
             if(matrixArray[j][i] != 0)
-                addRows(-1 * matrixArray[j][i], i, j);
+                addRows(-1 * matrixArray[j][i], i, j, i);
     }
 }
 
@@ -199,17 +211,16 @@ int Matrix::refDebug(){
         //get a 1 in the pivot position
         if(matrixArray[i][i] != 1 && matrixArray[i][i] != 0) {
             std::cout << "Step " << step++ << ": divide row " << i+1 << " by " << matrixArray[i][i] << "\n";
-            divideRow(i, matrixArray[i][i]);
+            divideRow(i, i, matrixArray[i][i]);
             print();
         }
             
         //zero out entries below pivot
         for(int j = i + 1; j < rows; ++j) 
-            if(matrixArray[j][i] != 0)
-            {
+            if(matrixArray[j][i] != 0) {
                 std::cout << "Step " << step++ << ": multiply row " << i+1
                         << " by " << -1*matrixArray[j][i] << " and adding to row " << j+1 << "\n";
-                addRows(-1 * matrixArray[j][i], i, j);
+                addRows(-1 * matrixArray[j][i], i, j, i);
                 ++additions;
                 print();
             }
@@ -253,8 +264,12 @@ void Matrix::rrefDebug() {
 
 void Matrix::print() const {
     for(int i = 0; i < rows; ++i) {
-        for(int j = 0; j < columns; ++j)
-            std::cout << "[" << matrixArray[i][j] << "]";
+        for(int j = 0; j < columns; ++j) {
+            if(matrixArray[i][j] == 0) //just so -0 doesnt get printed since that looks odd
+                std::cout << "[" << 0 << "]";
+            else
+                std::cout << "[" << matrixArray[i][j] << "]";
+        }
         std::cout << "\n";
     }
     std::cout << "\n";
