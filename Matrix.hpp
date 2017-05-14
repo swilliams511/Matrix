@@ -43,13 +43,13 @@ public:
     void fill(double x);
     
     //Precondition: index1 and index2 are not equal and are between 1 and rows.
-    //assumes rows > 1
+    //assumes rows > 1, else type 1 exit
     //Postcondition: all elements from row x are swapped with those in row y
     //O(1)
     void rowSwap(int rowIndex1, int rowIndex2);
     
     //Precondition: index1 and index2 are not equal and are between 1 and columns.
-    //assumes columns > 1
+    //assumes columns > 1, else type 1 exit
     //Postcondition: all elements from column x are swapped with those in column y
     //O(n), if n is the number of columns
     void columnSwap(int columnIndex1, int columnIndex2);
@@ -72,6 +72,8 @@ public:
     int refDebug();
     void rrefDebug();
     
+    void transpose();
+    
     void print() const;
     
     //O(m*n) 
@@ -80,7 +82,12 @@ public:
     Matrix operator- (const Matrix& other) const;
     Matrix operator-= (const Matrix& other);
     
+    Matrix operator* (const double& scalar) const;
+    
+    
+    
     double* operator[] (int index);
+    double* operator[] (int index) const;
     
     
 private:
@@ -88,11 +95,24 @@ private:
     int columns;
     double** matrixArray;
     
-    
+    //helper functions to reduce overall operations
     void addRows(double scalar, int index1, int index2, int startIndex);
-    
     void divideRow(int rowIndex, int startIndex, double x);
 };
+
+
+//commutativity multiplication of a scalar and a matrix
+Matrix operator* (const double& scalar, const Matrix& rhs);
+
+/* Exit types
+ * exit(1) -> row or column swap indices not on a valid range
+ * 
+ * 
+ * 
+ * 
+ */
+
+
 
 
 #endif /* MATRIX_HPP */

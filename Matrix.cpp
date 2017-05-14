@@ -42,25 +42,23 @@ Matrix::Matrix(std::vector<std::vector<double>> matrix) {
 }
 
 Matrix::Matrix(std::initializer_list<std::initializer_list<double>> set) {
+    
+    //casts the double initializer list into a vector of initializer lists
     std::vector<std::initializer_list<double>>setVec = set;
     
-    std::vector<std::vector<double>> v;
-    for(auto i = setVec.begin(); i != setVec.end(); i++) {
-        v.push_back(std::vector<double>(*i));
-    }
-    rows = v.size();
+    //Get the data out of the initializer lists
+    std::vector<std::vector<double>> vector;
+    for(auto i = setVec.begin(); i != setVec.end(); i++)
+        vector.push_back(std::vector<double>(*i));
+    
+    rows = vector.size();
     matrixArray = new double* [rows];
-    columns = v.at(0).size();
+    columns = vector.at(0).size();
     for(int i = 0; i < rows; ++i) {
         matrixArray[i] = new double[columns];
         for(int j = 0; j < columns; ++j)
-            matrixArray[i][j] = v[i][j];
+            matrixArray[i][j] = vector[i][j];
     }
-    
-    
-    
-    
-    std::cout << "here\n";
 }
 
 Matrix::Matrix(const Matrix& other) {
@@ -76,10 +74,10 @@ Matrix::Matrix(const Matrix& other) {
 
 //Implemented following copy/swap paradigm
 Matrix Matrix::operator= (Matrix other) {
-    rows = other.rows;
-    columns = other.columns;
-    std::swap(matrixArray, other.matrixArray);
-    return *this;
+        std::swap(rows, other.rows);
+        std::swap(columns, other.columns);
+        std::swap(matrixArray, other.matrixArray);
+        return *this;
 }
 
 Matrix::~Matrix() {
@@ -93,6 +91,9 @@ double* Matrix::operator[] (int index) {
     return matrixArray[index];
 }
 
+double* Matrix::operator[] (int index) const {
+    return matrixArray[index];
+}
 
 Matrix Matrix::identity(int n) {
     Matrix identity(n);
@@ -112,7 +113,7 @@ void Matrix::fill(double x) {
 void Matrix::rowSwap(int rowIndex1, int rowIndex2) {
     if(rows < 2 || rowIndex1 < 0 || rowIndex2 < 0 || rowIndex1 > rows - 1 || rowIndex2 > rows - 1) {
         std::cout << "Invalid row swap parameters\n";
-        exit;
+        exit(1);
     }
     std::swap(matrixArray[rowIndex1],matrixArray[rowIndex2]); 
 }
@@ -120,8 +121,8 @@ void Matrix::rowSwap(int rowIndex1, int rowIndex2) {
 void Matrix::columnSwap(int columnIndex1, int columnIndex2) {
     if(columns < 2 || columnIndex1 < 0 || columnIndex2 < 0 || 
        columnIndex1 > columns - 1 || columnIndex2 > columns - 1) {
-        std::cout << "Invalid row swap parameters\n";
-        exit;
+        std::cout << "Invalid column swap parameters\n";
+        exit(1);
     }    
     for(int i = 0; i < rows; ++i)
         std::swap(matrixArray[i][columnIndex1], matrixArray[i][columnIndex2]);
@@ -261,8 +262,28 @@ void Matrix::rrefDebug() {
     print();
 }
 
-//
+void Matrix::transpose() {
+    //if we have a square matrix
+    if(rows == columns) {
+        for(int i = 0; i < rows - 1; ++i)
+            for(int j = i + 1; j < columns; ++j)
+                std::swap(matrixArray[i][j], matrixArray[j][i]);
+    }
+    //we have a n x m matrix
+    else {
+        Matrix temp(columns, rows);
+        for(int i = 0; i < rows; ++i)
+            for(int j = 0; j < columns; ++j)
+                temp[j][i] = matrixArray[i][j];
+        *this = temp;
+    }
+}
+
+
+
+//prints some debug info
 void Matrix::print() const {
+    //std::cout << rows << "," << columns << "\n";
     for(int i = 0; i < rows; ++i) {
         for(int j = 0; j < columns; ++j) {
             if(matrixArray[i][j] == 0) //just so -0 doesnt get printed since that looks odd
@@ -275,3 +296,53 @@ void Matrix::print() const {
     std::cout << "\n";
 }
 
+Matrix Matrix::operator +(const Matrix& other) const {
+    //If we are doing an invalid sum, just return *this object
+    if (rows != other.rows || columns != other.columns) {
+        std::cout << "Invalid dimensions! " << rows << "x" << columns 
+                << " must equal " << other.rows << "x" << other.columns << "\n";
+        return *this;
+    }
+    
+    Matrix sum(*this);
+    for(int i = 0; i < rows; ++i)
+        for(int j = 0; j < columns; ++j)
+            sum[i][j] += other[i][j];
+    return sum;
+}
+
+Matrix Matrix::operator +=(const Matrix& other) {
+    *this = *this + other;
+    return *this;
+}
+
+Matrix Matrix::operator -(const Matrix& other) const {
+    //If we are doing an invalid sum, just return *this object
+    if (rows != other.rows || columns != other.columns) {
+        std::cout << "Invalid dimensions! " << rows << "x" << columns 
+                << " must equal " << other.rows << "x" << other.columns << "\n";
+        return *this;
+    }
+    
+    Matrix difference(*this);
+    for(int i = 0; i < rows; ++i)
+        for(int j = 0; j < columns; ++j)
+            difference[i][j] -= other[i][j];
+    return difference;    
+}
+
+Matrix Matrix::operator -=(const Matrix& other) {
+    *this = *this - other;
+    return *this;
+}
+
+Matrix Matrix::operator* (const double& scalar) const {
+    for(int i = 0; i < rows; ++i)
+        for(int j = 0; j < columns; ++j)
+            matrixArray[i][j] *= scalar;
+    return *this;
+}
+
+Matrix operator* (const double& scalar, const Matrix& rhs){
+    return rhs * scalar;
+}

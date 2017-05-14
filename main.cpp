@@ -98,7 +98,31 @@ int main(int argc, char** argv) {
     stop = time();
     timeTaken(start,stop);
     
-
+    Matrix m1 { {1, 1, 1},
+                {1, 1, 1},
+                {1, 1, 1}};
+    Matrix m2 { {1, 1, 1},
+                {1, 1, 1}};
+    Matrix m3 = m1 + m2;
+    m3 = m1 + m1;
+    m3.print();
+    m3 += m3;
+    m3.print();
+    m3 * .25;
+    m3.print();
+    m3 = 12 * m3;
+    std::cout << "made it\n";
+    m3.print();
+    
+    Matrix t1 { { 1, 2, 3},
+                { 4, 5, 6},
+                { 7, 8, 9}};
+    t1.print();
+    t1.transpose();
+    t1.print();
+    m2.print();
+    m2.transpose();
+    m2.print();
     
     return 0;
 }
