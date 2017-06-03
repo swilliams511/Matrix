@@ -336,6 +336,32 @@ Matrix Matrix::operator -=(const Matrix& other) {
     return *this;
 }
 
+Matrix Matrix::operator* (const Matrix& other) const {
+    // must be of the form  (N x M) * (M x P)
+    if(columns != other.rows)
+        exit(2);
+    
+    //Product dimensions are (N x P)
+    Matrix product(rows,other.columns);
+    
+    for(int i = 0; i < rows; ++i)
+        for(int j = 0; j < other.columns; ++j){
+            int sum = 0;
+            for(int k = 0; k < columns; ++k) 
+                sum += matrixArray[i][k] * other.matrixArray[k][j];
+            product.matrixArray[i][j] = sum;
+            
+        }
+    return product;
+}
+
+
+
+
+
+
+
+
 Matrix Matrix::operator* (const double& scalar) const {
     for(int i = 0; i < rows; ++i)
         for(int j = 0; j < columns; ++j)
@@ -345,4 +371,41 @@ Matrix Matrix::operator* (const double& scalar) const {
 
 Matrix operator* (const double& scalar, const Matrix& rhs){
     return rhs * scalar;
+}
+
+//Crout matrix decomposition
+//Returns a lower triangular matrix and a unit upper triangular matrix
+std::vector<Matrix> Matrix::LU() const {
+    
+    Matrix l(rows);
+    Matrix u(rows);
+    double sum = 0;
+
+    for(int i = 0; i < rows; ++i) {
+        
+        //U has 1's along its diagonal
+        u[i][i] = 1;
+        
+        //Populate L
+        for(int j = i; j < rows; ++j) {
+            sum = 0;
+            for(int k = 0; k < i; ++k)
+                sum += l[j][k] * u[k][i];
+            l[j][i] = matrixArray[j][i] - sum;
+        }
+        
+        //Populate the rest of U
+        for(int j = i+1; j < rows; ++j) {
+            sum = 0;
+            for(int k = 0; k < i; ++k)
+                sum += l[i][k] * u[k][j];
+            if(l[i][i] == 0)
+                exit(3);
+            u[i][j] = (matrixArray[i][j] - sum) / l[i][i]; 
+        }  
+    }
+    std::vector<Matrix> returnValues;
+    returnValues.push_back(l);
+    returnValues.push_back(u);
+    return returnValues;
 }

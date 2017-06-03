@@ -82,10 +82,21 @@ public:
     Matrix operator- (const Matrix& other) const;
     Matrix operator-= (const Matrix& other);
     
+    //O(n^3)
+    Matrix operator* (const Matrix& other) const;
+    
+    //rhs scalar multiplication
     Matrix operator* (const double& scalar) const;
     
+    //Matrix LU decomposition using Crout's algorithm
+    //Returns a vector containing two matrices, L and U,
+    //Where L is a lower triangular matrix and
+    //U is a unit upper triangular matrix, where
+    //(*this == L * U) is true
+    std::vector<Matrix> LU() const;
     
     
+    //element accessors
     double* operator[] (int index);
     double* operator[] (int index) const;
     
@@ -106,8 +117,8 @@ Matrix operator* (const double& scalar, const Matrix& rhs);
 
 /* Exit types
  * exit(1) -> row or column swap indices not on a valid range
- * 
- * 
+ * exit(2) -> matrices can't be multiplied
+ * exit(3) -> can't divide by zero
  * 
  * 
  */

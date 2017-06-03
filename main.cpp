@@ -117,12 +117,33 @@ int main(int argc, char** argv) {
     Matrix t1 { { 1, 2, 3},
                 { 4, 5, 6},
                 { 7, 8, 9}};
+    Matrix LU = t1;
     t1.print();
     t1.transpose();
     t1.print();
     m2.print();
     m2.transpose();
     m2.print();
+    
+    Matrix mult1 {{1, 2}, {3, 4}};
+    Matrix mult2 {{2, 0}, {1, 2}};
+    Matrix product = mult1 * mult2;
+    product.print();
+    
+    //Testing Crout LU decomposition
+    LU.LU();
+    Matrix LU2 {{1,3,5},{2,4,7},{1,1,0}};
+    std::vector<Matrix> luValues = LU2.LU();
+    Matrix prod = luValues[0] * luValues[1];
+    std::cout << "---Matrix L---\n";
+    luValues[0].print();
+    std::cout << "---Matrix U---\n";
+    luValues[1].print();
+    std::cout << "---L * U---\n";
+    prod.print();
+    std::cout << "---Starting Matrix, should equal L * U---\n";
+    LU2.print();
+            
     
     return 0;
 }
